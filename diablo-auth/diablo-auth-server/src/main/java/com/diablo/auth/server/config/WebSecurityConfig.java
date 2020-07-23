@@ -47,6 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected UserDetailsService userDetailsService() {
         return createUserDetailsService();
     }
+
+
     private UserDetailsService createUserDetailsService() {
         String password = passwordEncoder().encode("123456");
         List<UserDetails> users = new ArrayList<>();

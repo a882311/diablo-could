@@ -1,5 +1,6 @@
 package com.diablo.auth.server.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +14,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 
-
+@Slf4j
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
@@ -25,6 +27,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private UserDetailsService userDetailsService;
     @Resource
     private AuthenticationManager authenticationManager;
+    @Resource
+    private DataSource dataSource;
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
@@ -44,31 +48,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        String client_secret = passwordEncoder.encode("123456");
-        clients
-                .inMemory()
-                // admin，授权码认证、密码认证、客户端认证、简单认证、刷新token
-                .withClient("admin")
-                .secret(client_secret)
-                .resourceIds("xmall-auth", "xmall-product")
-                .scopes("server", "select")
-                .authorizedGrantTypes("authorization_code", "password", "refresh_token", "client_credentials", "implicit")
-                .redirectUris("http://www.baidu.com")
-
-                .and()
-                // client_1，密码认证、刷新token
-                .withClient("client_1")
-                .secret(client_secret)
-                .resourceIds("xmall-auth", "xmall-product")
-                .scopes("server", "select")
-                .authorizedGrantTypes("password", "refresh_token")
-
-                .and()
-                // client_2，客户端认证、刷新token
-                .withClient("client_2")
-                .secret(client_secret)
-                .resourceIds("xmall-auth", "xmall-product")
-                .scopes("server", "select")
-                .authorizedGrantTypes("client_credentials", "refresh_token");
+        clients.jdbc(dataSource).passwordEncoder(passwordEncoder);
     }
 }

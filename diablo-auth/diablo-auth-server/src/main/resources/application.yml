@@ -1,9 +1,17 @@
 spring:
   application:
     name: auth-server
+  datasource:
+    name: test
+    url: jdbc:mysql://127.0.0.1:3306/auth?characterEncoding=utf8&generateSimpleParameterMetadata=true&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 server:
   port: 6001
+
+
 
 management:
   endpoint:
