@@ -17,6 +17,11 @@ spring:
 server:
   port: 6001
 
+jwt:
+  rsa-secret: 1112dda
+client:
+  rsa-secret: 1112dda
+
 
 
 management:

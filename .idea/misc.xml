@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/diablo-auth/diablo-auth-server/pom.xml" />
+        <option value="$PROJECT_DIR$/diablo-common/pom.xml" />
       </list>
     </option>
   </component>
