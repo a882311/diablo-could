@@ -1,5 +1,7 @@
 package com.diablo.auth.server.config;
 
+import com.diablo.auth.server.grant.password.PassWordAppTokenGranter;
+import com.diablo.auth.server.grant.password.PassWordAuthenticationProvider;
 import com.diablo.auth.server.util.jwt.RsaKeyHelper;
 import com.diablo.common.constant.RedisKeyConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +11,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -18,7 +21,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -32,8 +37,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Configuration
@@ -42,8 +46,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     @Resource
     private PasswordEncoder passwordEncoder;
-    @Resource
-    private UserDetailsService userDetailsService;
     @Resource
     private AuthenticationManager authenticationManager;
     @Resource
@@ -68,17 +70,16 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients()
                 .tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()");
+                .checkTokenAccess("isAuthenticated()");
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.tokenStore(new InMemoryTokenStore())
                 .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService)
-//                .tokenStore(redisTokenStore())
-                .accessTokenConverter(accessTokenConverter())
                 .tokenStore(new JwtTokenStore(accessTokenConverter()))
+                .accessTokenConverter(accessTokenConverter())
+                .tokenGranter(tokenGranter(endpoints))
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
     }
 
@@ -116,5 +117,18 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         };
         accessTokenConverter.setKeyPair(new KeyPair(new RSAPublicKeyImpl(pub), RSAPrivateCrtKeyImpl.newKey(pri)));
         return accessTokenConverter;
+    }
+
+    private TokenGranter tokenGranter(final AuthorizationServerEndpointsConfigurer endpoints) {
+        List<TokenGranter> granters = new ArrayList<>(Collections.singletonList(endpoints.getTokenGranter()));
+        PassWordAppTokenGranter miniAppTokenGranter = new PassWordAppTokenGranter(endpoints.getTokenServices()
+                , endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory(), authenticationManager);
+        granters.add(miniAppTokenGranter);
+        if (authenticationManager instanceof ProviderManager) {
+            List<AuthenticationProvider> providers = ((ProviderManager) authenticationManager).getProviders();
+            PassWordAuthenticationProvider passWordAuthenticationProvider = new PassWordAuthenticationProvider();
+            providers.add(passWordAuthenticationProvider);
+        }
+        return new CompositeTokenGranter(granters);
     }
 }

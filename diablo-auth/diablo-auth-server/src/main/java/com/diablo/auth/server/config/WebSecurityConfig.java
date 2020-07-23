@@ -36,30 +36,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    @Bean(name = "userDetailsService")
-    @Override
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-        return createUserDetailsService();
-    }
-
-    @Override
-    protected UserDetailsService userDetailsService() {
-        return createUserDetailsService();
-    }
-
-
-    private UserDetailsService createUserDetailsService() {
-        String password = passwordEncoder().encode("123456");
-        List<UserDetails> users = new ArrayList<>();
-        UserDetails user_admin = User.withUsername("admin").password(password).authorities("ADMIN", "USER").build();
-        UserDetails user_1 = User.withUsername("user_1").password(password).authorities("ADMIN", "USER").build();
-        UserDetails user_2 = User.withUsername("user_2").password(password).authorities("USER").build();
-        users.add(user_admin);
-        users.add(user_1);
-        users.add(user_2);
-        return new InMemoryUserDetailsManager(users);
-}
+//
+//    @Bean(name = "userDetailsService")
+//    @Override
+//    public UserDetailsService userDetailsServiceBean() throws Exception {
+//        return createUserDetailsService();
+//    }
+//
+//    @Override
+//    protected UserDetailsService userDetailsService() {
+//        return createUserDetailsService();
+//    }
+//
+//
+//    private UserDetailsService createUserDetailsService() {
+//        String password = passwordEncoder().encode("123456");
+//        List<UserDetails> users = new ArrayList<>();
+//        UserDetails user_admin = User.withUsername("admin").password(password).authorities("ADMIN", "USER").build();
+//        UserDetails user_1 = User.withUsername("user_1").password(password).authorities("ADMIN", "USER").build();
+//        UserDetails user_2 = User.withUsername("user_2").password(password).authorities("USER").build();
+//        users.add(user_admin);
+//        users.add(user_1);
+//        users.add(user_2);
+//        return new InMemoryUserDetailsManager(users);
+//}
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
