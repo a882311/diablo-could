@@ -7,6 +7,12 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    database: 10
+    host: ${REDIS_HOST:10.2.1.70}
+    port: ${REDIS_PORT:6379}
+    pool:
+      max-active: 20
 
 server:
   port: 6001
