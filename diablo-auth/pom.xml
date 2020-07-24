@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>diablo-auth</artifactId>
+    <packaging>pom</packaging>
 
     <modules>
         <module>diablo-auth-server</module>
