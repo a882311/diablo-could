@@ -1,4 +1,4 @@
-package com.diablo.auth.server.grant.password;
+package com.diablo.auth.server.grant.sms;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import javax.security.auth.Subject;
 import java.util.Collection;
 
-public class PassWordAuthenticationToken extends AbstractAuthenticationToken {
+public class SmsAuthenticationToken extends AbstractAuthenticationToken {
 
     private Object principal;
     private Object credentials;
@@ -34,13 +34,13 @@ public class PassWordAuthenticationToken extends AbstractAuthenticationToken {
         return false;
     }
 
-    public PassWordAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
+    public SmsAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         super.setAuthenticated(true);
     }
 
-    public PassWordAuthenticationToken(String userName, String password) {
+    public SmsAuthenticationToken(String userName, String password) {
         super(null);
         this.password = password;
         this.userName = userName;

@@ -1,4 +1,4 @@
-package com.diablo.auth.server.grant.password;
+package com.diablo.auth.server.grant.sms;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -15,12 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Slf4j
-public class PassWordAppTokenGranter extends AbstractTokenGranter {
+public class SmsAppTokenGranter extends AbstractTokenGranter {
 
-    private static final String GRANT_TYPE = "password1";
+    private static final String GRANT_TYPE = "sms";
     private final AuthenticationManager authenticationManager;
 
-    public PassWordAppTokenGranter(AuthorizationServerTokenServices tokenServices
+    public SmsAppTokenGranter(AuthorizationServerTokenServices tokenServices
             , ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory
             , final AuthenticationManager authenticationManager) {
         super(tokenServices, clientDetailsService, requestFactory, GRANT_TYPE);
@@ -33,7 +33,7 @@ public class PassWordAppTokenGranter extends AbstractTokenGranter {
         Map<String, String> parameters = new LinkedHashMap<>(tokenRequest.getRequestParameters());
         String username = parameters.get("username");
         String password = parameters.get("password");
-        Authentication userAuth = new PassWordAuthenticationToken(username, password);
+        Authentication userAuth = new SmsAuthenticationToken(username, password);
         ((AbstractAuthenticationToken) userAuth).setDetails(parameters);
         try {
             userAuth = authenticationManager.authenticate(userAuth);

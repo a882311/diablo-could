@@ -1,7 +1,7 @@
 package com.diablo.auth.server.config;
 
-import com.diablo.auth.server.grant.password.PassWordAppTokenGranter;
-import com.diablo.auth.server.grant.password.PassWordAuthenticationProvider;
+import com.diablo.auth.server.grant.sms.SmsAppTokenGranter;
+import com.diablo.auth.server.grant.sms.SmsAuthenticationProvider;
 import com.diablo.auth.server.util.jwt.RsaKeyHelper;
 import com.diablo.common.constant.RedisKeyConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -121,13 +121,13 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
     private TokenGranter tokenGranter(final AuthorizationServerEndpointsConfigurer endpoints) {
         List<TokenGranter> granters = new ArrayList<>(Collections.singletonList(endpoints.getTokenGranter()));
-        PassWordAppTokenGranter miniAppTokenGranter = new PassWordAppTokenGranter(endpoints.getTokenServices()
+        SmsAppTokenGranter smsAppTokenGranter = new SmsAppTokenGranter(endpoints.getTokenServices()
                 , endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory(), authenticationManager);
-        granters.add(miniAppTokenGranter);
+        granters.add(smsAppTokenGranter);
         if (authenticationManager instanceof ProviderManager) {
             List<AuthenticationProvider> providers = ((ProviderManager) authenticationManager).getProviders();
-            PassWordAuthenticationProvider passWordAuthenticationProvider = new PassWordAuthenticationProvider();
-            providers.add(passWordAuthenticationProvider);
+            SmsAuthenticationProvider smsAuthenticationProvider = new SmsAuthenticationProvider();
+            providers.add(smsAuthenticationProvider);
         }
         return new CompositeTokenGranter(granters);
     }
